@@ -1,0 +1,158 @@
+
+ATTiny85 RGB PWM.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000068  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000bc  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000bc  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000ec  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  00000128  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   0000054d  00000000  00000000  00000148  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000004b8  00000000  00000000  00000695  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000224  00000000  00000000  00000b4d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000024  00000000  00000000  00000d74  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    0000030d  00000000  00000000  00000d98  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000092  00000000  00000000  000010a5  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  00001137  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0e c0       	rjmp	.+28     	; 0x1e <__ctors_end>
+   2:	15 c0       	rjmp	.+42     	; 0x2e <__bad_interrupt>
+   4:	14 c0       	rjmp	.+40     	; 0x2e <__bad_interrupt>
+   6:	13 c0       	rjmp	.+38     	; 0x2e <__bad_interrupt>
+   8:	12 c0       	rjmp	.+36     	; 0x2e <__bad_interrupt>
+   a:	11 c0       	rjmp	.+34     	; 0x2e <__bad_interrupt>
+   c:	10 c0       	rjmp	.+32     	; 0x2e <__bad_interrupt>
+   e:	0f c0       	rjmp	.+30     	; 0x2e <__bad_interrupt>
+  10:	0e c0       	rjmp	.+28     	; 0x2e <__bad_interrupt>
+  12:	0d c0       	rjmp	.+26     	; 0x2e <__bad_interrupt>
+  14:	0c c0       	rjmp	.+24     	; 0x2e <__bad_interrupt>
+  16:	0b c0       	rjmp	.+22     	; 0x2e <__bad_interrupt>
+  18:	0a c0       	rjmp	.+20     	; 0x2e <__bad_interrupt>
+  1a:	09 c0       	rjmp	.+18     	; 0x2e <__bad_interrupt>
+  1c:	08 c0       	rjmp	.+16     	; 0x2e <__bad_interrupt>
+
+0000001e <__ctors_end>:
+  1e:	11 24       	eor	r1, r1
+  20:	1f be       	out	0x3f, r1	; 63
+  22:	cf e5       	ldi	r28, 0x5F	; 95
+  24:	d2 e0       	ldi	r29, 0x02	; 2
+  26:	de bf       	out	0x3e, r29	; 62
+  28:	cd bf       	out	0x3d, r28	; 61
+  2a:	02 d0       	rcall	.+4      	; 0x30 <main>
+  2c:	1b c0       	rjmp	.+54     	; 0x64 <_exit>
+
+0000002e <__bad_interrupt>:
+  2e:	e8 cf       	rjmp	.-48     	; 0x0 <__vectors>
+
+00000030 <main>:
+    DDRB is 8 bits: [unused:unused:DDB5:DDB4:DDB3:DDB2:DDB1:DDB0]
+    1<<DDB4: sets bit DDB4 (data-direction, port B, pin 4), which puts PB4 (port B, pin 4) in output mode
+    1<<DDB1: sets bit DDB1 (data-direction, port B, pin 1), which puts PB1 (port B, pin 1) in output mode
+    1<<DDB0: sets bit DDB0 (data-direction, port B, pin 0), which puts PB0 (port B, pin 0) in output mode
+    */
+    DDRB = 1<<DDB4 | 1<<DDB1 | 1<<DDB0;
+  30:	83 e1       	ldi	r24, 0x13	; 19
+  32:	87 bb       	out	0x17, r24	; 23
+    TCCR0A is 8 bits: [COM0A1:COM0A0:COM0B1:COM0B0:unused:unused:WGM01:WGM00]
+    2<<COM0A0: sets bits COM0A0 and COM0A1, which (in Fast PWM mode) clears OC0A on compare-match, and sets OC0A at BOTTOM
+    2<<COM0B0: sets bits COM0B0 and COM0B1, which (in Fast PWM mode) clears OC0B on compare-match, and sets OC0B at BOTTOM
+    3<<WGM00: sets bits WGM00 and WGM01, which (when combined with WGM02 from TCCR0B below) enables Fast PWM mode
+    */
+    TCCR0A = 2<<COM0A0 | 2<<COM0B0 | 3<<WGM00;
+  34:	83 ea       	ldi	r24, 0xA3	; 163
+  36:	8a bd       	out	0x2a, r24	; 42
+    Control Register B for Timer/Counter-0 (Timer/Counter-0 is configured using two registers: A and B)
+    TCCR0B is 8 bits: [FOC0A:FOC0B:unused:unused:WGM02:CS02:CS01:CS00]
+    0<<WGM02: bit WGM02 remains clear, which (when combined with WGM00 and WGM01 from TCCR0A above) enables Fast PWM mode
+    1<<CS00: sets bits CS01 (leaving CS01 and CS02 clear), which tells Timer/Counter-0 to not use a prescalar
+    */
+    TCCR0B = 0<<WGM02 | 1<<CS00;
+  38:	81 e0       	ldi	r24, 0x01	; 1
+  3a:	83 bf       	out	0x33, r24	; 51
+    TCCR1 is 8 bits: [CTC1:PWM1A:COM1A1:COM1A0:CS13:CS12:CS11:CS10]
+    0<<PWM1A: bit PWM1A remains clear, which prevents Timer/Counter-1 from using pin OC1A (which is shared with OC0B)
+    0<<COM1A0: bits COM1A0 and COM1A1 remain clear, which also prevents Timer/Counter-1 from using pin OC1A (see PWM1A above)
+    1<<CS10: sets bit CS11 which tells Timer/Counter-1  to not use a prescalar
+    */
+    TCCR1 = 0<<PWM1A | 0<<COM1A0 | 1<<CS10;
+  3c:	80 bf       	out	0x30, r24	; 48
+    General Control Register for Timer/Counter-1 (this is for Timer/Counter-1 and is a poorly named register)
+    GTCCR is 8 bits: [TSM:PWM1B:COM1B1:COM1B0:FOC1B:FOC1A:PSR1:PSR0]
+    1<<PWM1B: sets bit PWM1B which enables the use of OC1B (since we disabled using OC1A in TCCR1)
+    2<<COM1B0: sets bit COM1B1 and leaves COM1B0 clear, which (when in PWM mode) clears OC1B on compare-match, and sets at BOTTOM
+    */
+    GTCCR = 1<<PWM1B | 2<<COM1B0;
+  3e:	80 e6       	ldi	r24, 0x60	; 96
+  40:	8c bd       	out	0x2c, r24	; 44
+void main()
+{
+    /*
+    Starting values for red, green and blue
+    */
+    uint8_t r=0, g=85, b=170;
+  42:	80 e0       	ldi	r24, 0x00	; 0
+    for (;;)
+    {
+        /*
+        increment and boundary-check each color
+        */
+        if (++r>255) r=0;
+  44:	91 e0       	ldi	r25, 0x01	; 1
+  46:	98 0f       	add	r25, r24
+        if (++g>255) g=0;
+  48:	26 e5       	ldi	r18, 0x56	; 86
+  4a:	28 0f       	add	r18, r24
+        if (++b>255) b=0;
+  4c:	85 55       	subi	r24, 0x55	; 85
+        
+        /*
+        update compare registers with red, green and blue values
+        */
+        OCR0A = r;
+  4e:	99 bd       	out	0x29, r25	; 41
+        OCR0B = g;
+  50:	28 bd       	out	0x28, r18	; 40
+        OCR1B = b;
+  52:	8b bd       	out	0x2b, r24	; 43
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  54:	ef e1       	ldi	r30, 0x1F	; 31
+  56:	fe e4       	ldi	r31, 0x4E	; 78
+  58:	31 97       	sbiw	r30, 0x01	; 1
+  5a:	f1 f7       	brne	.-4      	; 0x58 <__SREG__+0x19>
+  5c:	00 c0       	rjmp	.+0      	; 0x5e <__SREG__+0x1f>
+  5e:	00 00       	nop
+    for (;;)
+    {
+        /*
+        increment and boundary-check each color
+        */
+        if (++r>255) r=0;
+  60:	89 2f       	mov	r24, r25
+  62:	f0 cf       	rjmp	.-32     	; 0x44 <__SREG__+0x5>
+
+00000064 <_exit>:
+  64:	f8 94       	cli
+
+00000066 <__stop_program>:
+  66:	ff cf       	rjmp	.-2      	; 0x66 <__stop_program>
